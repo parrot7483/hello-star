@@ -1,15 +1,11 @@
 module Impl.Hello
 
 open FStar.HyperStack.ST
-open LowStar.Buffer
-open LowStar.BufferOps
 
-module ST = FStar.HyperStack.ST
-module HS = FStar.HyperStack
-module UInt32 = FStar.UInt32
+module U32 = FStar.UInt32
 
 let print_hello_n_times n =
-  let body (i: UInt32.t{ UInt32.v i < UInt32.v n }): ST.Stack unit
+  let body (i: U32.t{ U32.v i < U32.v n }): Stack unit
     (requires (fun _ -> True))
     (ensures (fun _ _ _ -> True))
   =
@@ -20,17 +16,16 @@ let print_hello_n_times n =
   C.Loops.for 0ul n (fun _ _ -> True) body
 
 noextract
-let rec fib (n:nat) : nat =
-  if n <= 1 then 1
+let rec fib (n: nat) : nat =
+  if n <= 1 then n
   else fib (n - 1) + fib (n - 2)
 
-open FStar.UInt
-open FStar.UInt32
-let rec fibonacci (num: UInt32.t { size (fib (v num)) 32 })
-: Tot (res:UInt32.t { v res == fib (v num) })
-      (decreases v num)
-= if num <=^ 1ul then
-    1ul
+let rec fibonacci (num: U32.t { FStar.UInt.size (fib (U32.v num)) 32 })
+: Tot (res: U32.t { U32.v res == fib (U32.v num) })
+      (decreases U32.v num)
+= let open U32 in 
+  if num <=^ 1ul then
+    num
   else
     fibonacci (num -^ 1ul) +^ fibonacci (num -^ 2ul)
 
